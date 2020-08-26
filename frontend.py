@@ -590,26 +590,13 @@ class Ui_MainWindow(object):
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
         self.tab_2.setFont(font)
-        self.tableWidget = QTableWidget(self.tab_2)
-        self.tableWidget.setObjectName(u"tableWidget")
-        self.tableWidget.setGeometry(QRect(5, 6, 431, 650))
-        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
-        self.tableWidget.setSizePolicy(sizePolicy)
-        self.tableWidget.setFrameShape(QFrame.WinPanel)
-        self.tableWidget.setFrameShadow(QFrame.Raised)
-        self.tableWidget.setLineWidth(4)
-        self.tableWidget.setMidLineWidth(7)
+        
         self.tabWidget.addTab(self.tab_2, "")
 
         self.verticalLayout_5.addWidget(self.tabWidget)
 
         MainWindow.setCentralWidget(self.centralwidget)
-        self.dockWidget_3 = QDockWidget(MainWindow)
-        self.dockWidget_3.setObjectName(u"dockWidget_3")
-        self.dockWidgetContents_3 = QWidget()
-        self.dockWidgetContents_3.setObjectName(u"dockWidgetContents_3")
-        self.dockWidget_3.setWidget(self.dockWidgetContents_3)
-        MainWindow.addDockWidget(Qt.TopDockWidgetArea, self.dockWidget_3)
+    
 
         self.retranslateUi(MainWindow)
 

@@ -3,10 +3,10 @@
 
 from PySide2 import QtWidgets, QtGui, QtCore, QtSql
 from PySide2.QtGui import QStandardItemModel
-from PySide2.QtCore import QDateTime, Qt
+from PySide2.QtCore import QDateTime, Qt, QRect, QSize
 from PySide2.QtGui import QPainter
 from PySide2.QtWidgets import (QWidget, QHeaderView, QHBoxLayout, QTableView,
-                               QSizePolicy, QTableWidget, QLabel)
+                               QSizePolicy, QTableWidget, QLabel, QAction, QDockWidget, QFrame)
 from PySide2.QtCharts import QtCharts
 
 import frontend
@@ -24,18 +24,46 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         #self.createDB()
 
         self.btn_asc_lesen_2.clicked.connect(self.bring_data)
-        self.tableWidget.CurrentChanged.connect(self.label_write)
-        self.tableview =QTableView()
-        self.tableview.setModel(tablemodel)
-        self.tableview.clicked.connect(self.viewClicked)
+        #self.tableWidget.CurrentChanged.connect(self.label_write)
+        #self.tableview.setModel(tablemodel)
+        #self.tableview.clicked.connect(self.viewClicked)
+        
+        ######### Create MENU
+        bar = self.menuBar()
 
-    def viewClicked(self):
-        self.label_cell = QLabel(self.tab_2)
-        self.label_cell.setObjectName(self.tableview.currentIndex())
+        file = bar.addMenu("Create Component")
+        file.addAction("Component_1")
+        file.addAction("Component_2")
+        file.addAction("Component_3")
+        file.triggered[QAction].connect(self.combo_box_selectionchange)
 
-        self.tableWidget.setCurrentCell ="10"
+        ######### Create MENU
     
+
+
     
+
+
+
+    
+    def combo_box_selectionchange(self, q):
+        my_dock_widget = QDockWidget (str(q.text()), self.tab_2)
+        my_dock_widget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea | Qt.RightDockWidgetArea)
+        self.addDockWidget(Qt.LeftDockWidgetArea, my_dock_widget)
+        my_dock_widget.move(100,100)
+        my_dock_widget.setWindowTitle(q.text())
+        #icon = QtGui.QIcon()
+        #icon.addPixmap(QtGui.QPixmap("ukraine.png",QtGui.QIcon.Normal, QtGui.QIcon.On))
+        #topleftwindow.windowIcon(icon)
+        my_dock_widget.show()
+    # def viewClicked(self):
+    #     self.label_cell = QLabel(self.tab_2)
+    #     self.label_cell.setObjectName(self.tableview.currentIndex())
+
+    #     self.tableWidget.setCurrentCell ="10"
+    
+    def label_write (self):
+        pass
     
     def cbmodul_selectionchange(self):
         self.lineEdit_3.setText (self.cb_modul.currentText())
@@ -76,9 +104,21 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
 
     def bring_data(self):
         print("Hi")
+        #### Create TableWidget 
+
+        self.dock_for_table = QDockWidget(self.tab_2)
+        self.tableWidget = QTableWidget(self.dock_for_table)
+        self.tableWidget.setObjectName(u"tableWidget")
+        self.tableWidget.setGeometry(QRect(50, 6, 431, 650))
+        #sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
+        #self.tableWidget.setSizePolicy(sizePolicy)
+        #self.tableWidget.setFrameShape(QFrame.WinPanel)
+        #self.tableWidget.setFrameShadow(QFrame.Raised)
+        #self.tableWidget.setLineWidth(4)
+        #self.tableWidget.setMidLineWidth(7)
+
 
         ##### Read the File
-        #filename = QtWidgets.QFileDialog.getOpenFileName(self, "Open File",  "")[0]
         self.tableWidget.clear()
 
         filename = QtWidgets.QFileDialog.getOpenFileName(self, "Open File",  "/Users/macpro/Downloads/")[0]
@@ -92,29 +132,16 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         print(len(group_35))
 
         
-        
-        #self.lineEdit_3.setText(str(len(group_35)))
-
-        ####### Create QtableWidget in tab_2
-        #self.table = QtWidgets.QTableWidget(self.tab_2)
-        #self.tableWidget.setObjectName("table")
-        #self.table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
-        #self.table.resizeColumnsToContents()
-        self.tableWidget.setFixedWidth(800)
-        self.tableWidget.setFixedHeight(600)
+    
+        ####### Create QtableWidget in 
+        #self.tableWidget.setFixedWidth(800)
+        #self.tableWidget.setFixedHeight(600)
 
         self.r_number = group_35.shape[0]
-        #self.r_number = 5
         self.col_number = group_35.shape[1]
-        #self.col_number = 5
         self.tableWidget.setColumnCount(self.col_number)
         self.tableWidget.setRowCount(self.r_number)
         self.tableWidget.setRowCount(0)
-        #self.model = QStandardItemModel()
-        #self.model.setHorizontalHeaderLabels(['Name', 'Age', 'Sex', 'Add'])
-        #self.model.setHorizontalHeaderLabels(group_35.columns)
-        #self.tableWidget.setModel(self.model)
-
         self.tableWidget.setHorizontalHeaderLabels(group_35.columns)
         self.tableWidget.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
