@@ -33,9 +33,9 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         super(Myfrontend, self). __init__()
         self.setupUi(self)
         self.showMaximized()
-        global filename
-        filename = "/Users/macpro/Downloads/Log_demo2.txt"
-
+        global filename, column_names
+        filename = "/Users/macpro/Downloads/DS-Demo-Log.txt"
+        column_names =[]
         
 
         ######### Create MENU
@@ -70,7 +70,7 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
 
         sub = QMdiSubWindow()
         self.sub_combo = QtWidgets.QComboBox()
-        report_list =["Report 27","Report 33", "Report 35", "Report 37", "Report 39", "Report 41"]
+        report_list =[" ", "Report 27","Report 33", "Report 35", "Report 37", "Report 39", "Report 41"]
         for i in report_list:
             self.sub_combo.addItem(i)
         sub_layout = QtWidgets.QVBoxLayout()
@@ -115,10 +115,12 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
     
     def read_data (self):
         #filename = QtWidgets.QFileDialog.getOpenFileName(self, "Open File",  "/Users/macpro/Downloads/")[0]
-
+        global filename
         filename = "/Users/macpro/Downloads/Log_demo2.txt"
 
         self.tabWidget.setCurrentWidget(self.tab_2)
+
+    
 
     def fill_table(self):
         dataset=pd.read_csv(filename, delimiter="\t")
@@ -146,8 +148,8 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         for col in col_name_pd.columns:
             col_name_pd[col]= col_name_pd[col].replace("\n", "") 
             col_name_pd[col]= col_name_pd[col].replace(np.nan, "")
+        global column_names
         column_names = col_name_pd.loc[int(column_name_type.split(" ")[1])]
-        print(len(column_names))
         group_to_be_selected = "0"+column_name_type.split(" ")[1]
         #print(group_to_be_selected)
         try:
@@ -158,8 +160,28 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
 
         group_selected = group_selected.iloc[:,2:-2]
         group_selected.dropna(inplace=True, axis=1)
-        #group_selected.columns=column_names
         
+
+        ### Clean the Dataframe
+        for i in range(group_selected.shape[0]):
+            for j in range(group_selected.shape[1]):
+                #print(group_selected.iloc[i,j])
+                try:
+                    if group_selected.iloc[i,j].count(".") >= 2:
+                        v = group_selected.iloc[i,j].split(".")
+                        v1 = v[0]
+                        v2 = v[1]
+                        num = float("{}.{}".format(v1, v2))
+                        # print(num)
+                        num = round(num, 2)
+                        group_selected.iloc[i,j] = num
+                    else:
+                        num = float(group_selected.iloc[i,j])
+                        num = round(num, 2)
+                        group_selected.iloc[i,j] = num
+                except:
+                    print(group_selected.iloc[i,j], "Fail")
+    
 
        
         self.r_number = group_selected.shape[0]
@@ -186,15 +208,6 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         
 
 
-    
-
-        # for i in range(len(report_list_ready)):
-        #     self.tablewidget_2.insertRow(i)    
-        #     self.tablewidget_2.setItem(i, 0, QtWidgets.QTableWidgetItem(report_list_ready[i]))
-
-
-        #print(column_name_type)
-
 
     def draw_graph(self):
         indexes_ =[]
@@ -206,9 +219,17 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         #print(self.tableWidget.selectedRanges())
         #print(self.tableWidget.item(self.tableWidget.currentRow(), self.tableWidget.currentColumn()).text()) 
         indexes_text = [float(self.tableWidget.item(i, self.tableWidget.currentColumn()).text()) for i in indexes_]
-        sc.resize(100,100)
-        sc.axes.plot(indexes_text)  
-        sc.show()
+        #sc.resize(400,400)
+        
+        x_axes = [float(self.tableWidget.item(i, 0).text()) for i in indexes_]
+
+        sc.axes.plot(x_axes, indexes_text)
+        sc.axes.set_xlabel("Zeit")
+        #column_names[tableWidget.currentColumn()]
+        sc.axes.set_ylabel(column_names[self.tableWidget.currentColumn()+1])
+        sc.draw()
+        
+        #sc.show()
         #mytable.cellWidget(i, j).currentText()
 
 

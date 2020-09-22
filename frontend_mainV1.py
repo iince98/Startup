@@ -70,7 +70,7 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
 
         sub = QMdiSubWindow()
         self.sub_combo = QtWidgets.QComboBox()
-        report_list =["Report 27","Report 33", "Report 35", "Report 37", "Report 39", "Report 41"]
+        report_list =[" ", "Report 27","Report 33", "Report 35", "Report 37", "Report 39", "Report 41"]
         for i in report_list:
             self.sub_combo.addItem(i)
         sub_layout = QtWidgets.QVBoxLayout()
@@ -120,6 +120,25 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.tabWidget.setCurrentWidget(self.tab_2)
 
+    def clean_val(val):
+        #val = val.replace("\n","")
+        print(val)
+        try:
+            if val.count(".") >= 2:
+                v = val.split(".")
+                v1 = v[0]
+                v2 = v[1]
+                num = float("{}.{}".format(v1, v2))
+                # print(num)
+                num = round(num, 2)
+                return num
+            else:
+                num = float(val)
+                num = round(num, 2)
+                return num
+        except Exception as e:
+            return val
+
     def fill_table(self):
         dataset=pd.read_csv(filename, delimiter="\t")
         column_name_type = self.sub_combo.currentText()
@@ -147,7 +166,6 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
             col_name_pd[col]= col_name_pd[col].replace("\n", "") 
             col_name_pd[col]= col_name_pd[col].replace(np.nan, "")
         column_names = col_name_pd.loc[int(column_name_type.split(" ")[1])]
-        print(len(column_names))
         group_to_be_selected = "0"+column_name_type.split(" ")[1]
         #print(group_to_be_selected)
         try:
@@ -160,6 +178,27 @@ class Myfrontend (frontend.Ui_MainWindow, QtWidgets.QMainWindow):
         group_selected.dropna(inplace=True, axis=1)
         #group_selected.columns=column_names
         
+
+        ### Clean the Dataframe
+        for i in range(group_selected.shape[0]):
+            for j in range(group_selected.shape[1]):
+                print(group_selected.iloc[i,j])
+                try:
+                    if group_selected.iloc[i,j].count(".") >= 2:
+                        v = group_selected.iloc[i,j].split(".")
+                        v1 = v[0]
+                        v2 = v[1]
+                        num = float("{}.{}".format(v1, v2))
+                        # print(num)
+                        num = round(num, 2)
+                        group_selected.iloc[i,j] = num
+                    else:
+                        num = float(group_selected.iloc[i,j])
+                        num = round(num, 2)
+                        group_selected.iloc[i,j] = num
+                except:
+                    print(group_selected.iloc[i,j], "Fail")
+    
 
        
         self.r_number = group_selected.shape[0]
